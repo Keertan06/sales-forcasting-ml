@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trends</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<h1>📊 Sales Forecasting Analytics Dashboard</h1>
+
+<div class="tabs">
+    <a class="tablink" href="/">🔮 Prediction</a>
+    <a class="tablink active" href="/trends">📈 Trends</a>
+    <a class="tablink" href="/categories">📊 Categories</a>
+    <a class="tablink" href="/performance">🎯 Performance</a>
+</div>
+
+<div class="kpi-grid">
+    <div class="kpi-card revenue"><span>Total Revenue</span><h2>₹ {{ kpis.total_revenue }}</h2></div>
+    <div class="kpi-card avg"><span>Avg Order Value</span><h2>₹ {{ kpis.avg_order }}</h2></div>
+    <div class="kpi-card category"><span>Top Category</span><h2>{{ kpis.top_category }}</h2></div>
+    <div class="kpi-card customers"><span>Total Customers</span><h2>{{ kpis.total_customers }}</h2></div>
+</div>
+
+<div class="chart-card">
+    {{ trend_plot|safe }}
+</div>
+
+</body>
+</html>

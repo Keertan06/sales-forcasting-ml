@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sales Forecasting Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<h1>📊 Sales Forecasting Analytics Dashboard</h1>
+
+<div class="tabs">
+    <a class="tablink active" href="/">🔮 Prediction</a>
+    <a class="tablink" href="/trends">📈 Trends</a>
+    <a class="tablink" href="/categories">📊 Categories</a>
+    <a class="tablink" href="/performance">🎯 Performance</a>
+</div>
+
+<div class="kpi-grid"
+     data-revenue="{{ kpis.total_revenue }}"
+     data-avg="{{ kpis.avg_order }}">
+
+    <div class="kpi-card revenue">
+        <span>Total Revenue</span>
+        <h2 id="kpi-revenue">₹ 0</h2>
+    </div>
+    <div class="kpi-card avg">
+        <span>Avg Order Value</span>
+        <h2 id="kpi-avg">₹ 0</h2>
+    </div>
+    <div class="kpi-card category">
+        <span>Top Category</span>
+        <h2>{{ kpis.top_category }}</h2>
+    </div>
+    <div class="kpi-card customers">
+        <span>Total Customers</span>
+        <h2>{{ kpis.total_customers }}</h2>
+    </div>
+</div>
+
+<div class="card">
+    <h2>🔮 Sales Prediction</h2>
+
+    <label>Age</label>
+    <input type="number" id="age">
+
+    <label>Gender</label>
+    <select id="gender">
+        <option>Male</option>
+        <option>Female</option>
+    </select>
+
+    <label>Product Category</label>
+    <select id="category">
+        <option>Electronics</option>
+        <option>Clothing</option>
+        <option>Food</option>
+        <option>Beauty</option>
+        <option>Sports</option>
+    </select>
+
+    <label>Date</label>
+    <input type="date" id="date">
+
+    <button class="predict-btn" onclick="makePrediction()">Predict</button>
+
+    <div class="kpi-card revenue" style="margin-top:20px;">
+        <span>Predicted Sales</span>
+        <h2 id="result">₹ --</h2>
+    </div>
+</div>
+
+<script>
+function animateValue(id, end, prefix) {
+    let start = 0;
+    let duration = 1200;
+    let startTime = null;
+
+    function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        let progress = timestamp - startTime;
+        let value = Math.min(start + (progress / duration) * end, end);
+        document.getElementById(id).innerText = prefix + Math.floor(value);
+        if (progress < duration) window.requestAnimationFrame(step);
+    }
+    window.requestAnimationFrame(step);
+}
+
+const kpiGrid = document.querySelector('.kpi-grid');
+const revenue = parseFloat(kpiGrid.dataset.revenue);
+const avg = parseFloat(kpiGrid.dataset.avg);
+
+animateValue("kpi-revenue", revenue, "₹ ");
+animateValue("kpi-avg", avg, "₹ ");
+
+function makePrediction() {
+    const d = new Date(document.getElementById("date").value);
+
+    fetch('/predict', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            Age: parseInt(document.getElementById("age").value),
+            Year: d.getFullYear(),
+            Month: d.getMonth()+1,
+            Day: d.getDate(),
+            Gender: document.getElementById("gender").value,
+            Category: document.getElementById("category").value
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("result").innerText = "₹ " + data.prediction;
+    });
+}
+</script>
+
+</body>
+</html>
